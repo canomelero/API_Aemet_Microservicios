@@ -29,7 +29,7 @@ def get_municipio_meteo_repository(
 
 
 @router.get(
-    f"/{MUNICIPIO_ID}/meteo",
+    "/granada/meteo",
     response_model=MunicipioMeteo,
     status_code=status.HTTP_200_OK,
     summary="Devuelve los datos meteorológicos del municipio de Granada",

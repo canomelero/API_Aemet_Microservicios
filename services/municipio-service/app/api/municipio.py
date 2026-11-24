@@ -19,7 +19,7 @@ def get_municipio_repository() -> MunicipioRepository:
 
 
 @router.get(
-    f"/{MUNICIPIO_ID}",
+    "/granada",
     response_model=Municipio,
     status_code=status.HTTP_200_OK,
     summary="Devuelve el municipio de Granada",

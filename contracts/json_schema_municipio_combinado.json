@@ -1,0 +1,39 @@
+{
+  "$schema": "http://json-schema.org/draft-04/schema#",
+  "type": "object",
+  "properties": {
+    "municipioid": {
+      "type": "integer"
+    },
+    "geo": {
+      "$ref": "json_schema_municipio_geo.json"
+    },
+    "meteo": {
+      "$ref": "json_schema_municipio_meteo.json"
+    },
+    "demo": {
+      "$ref": "json_schema_municipio_demo.json"
+    }
+  },
+  "required": [
+    "municipioid"
+  ],
+  "anyOf": [
+    {
+      "required": [
+        "geo"
+      ]
+    },
+    {
+      "required": [
+        "meteo"
+      ]
+    },
+    {
+      "required": [
+        "demo"
+      ]
+    }
+  ],
+  "additionalProperties": false
+}

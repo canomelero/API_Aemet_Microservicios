@@ -1,0 +1,18 @@
+spring:
+  application:
+    name: municipio-orquestador-service
+  http:
+    client:
+      connect-timeout: 2s
+      read-timeout: 10s
+
+server:
+  port: 8005
+
+servicios:
+  geo:
+    base-url: http://localhost:8002
+  meteo:
+    base-url: http://localhost:8003
+  demo:
+    base-url: http://localhost:8004

@@ -29,7 +29,7 @@ def get_municipio_geo_repository(
 
 
 @router.get(
-    "/municipio/geo",
+    f"/{MUNICIPIO_ID}/geo",
     response_model=MunicipioGeo,
     status_code=status.HTTP_200_OK,
     summary="Devuelve los datos geográficos del municipio de Granada",

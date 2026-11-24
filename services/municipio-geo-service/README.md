@@ -145,7 +145,7 @@ uvicorn app.main:app --reload --port 8002
 Comprobación:
 
 ```bash
-curl http://localhost:8002/municipio/geo
+curl http://localhost:8002/<municipio>/geo
 ```
 
 Documentación interactiva:

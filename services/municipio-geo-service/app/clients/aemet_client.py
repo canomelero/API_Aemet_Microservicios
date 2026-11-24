@@ -2,12 +2,11 @@
 
 from typing import Any
 
-import httpx
+import httpx, json
 
 from app.config import AEMET_BASE_URL, AEMET_TIMEOUT_SECONDS, AEMET_API_KEY
 
-_MUNICIPIO_PATH = "/maestro/municipio"
-_AEMET_ID_PREFIX = "id"
+_MUNICIPIO_PATH = "/maestro/municipio/id"
 
 
 class AemetError(Exception):
@@ -52,8 +51,7 @@ class AemetClient:
 
         # El endpoint de detalle de AEMET espera el identificador con prefijo.
         url = (
-            f"{self._base_url}{_MUNICIPIO_PATH}/"
-            f"{_AEMET_ID_PREFIX}{municipio_id}"
+            f"{self._base_url}{_MUNICIPIO_PATH}{municipio_id}"
         )
         headers = {
             "Accept": "application/json"
@@ -107,7 +105,7 @@ class AemetClient:
             )
 
         try:
-            return response.json()
+            return json.loads(response.text)
         except ValueError as exc:
             raise AemetUpstreamError(
                 "La respuesta de AEMET no es JSON válido"

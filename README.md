@@ -8,8 +8,10 @@ El proyecto se construye paso a paso, con contratos JSON compartidos y servicios
 
 - Servicio `municipio-service` implementado en Python/FastAPI con respuesta estática desde JSON local.
 - Servicio `municipio-geo-service` implementado en Python/FastAPI que consulta AEMET OpenData.
+- Servicio `municipio-meteo-service` implementado en Python/FastAPI que consulta AEMET OpenData.
 - `municipio-service` no realiza llamadas externas.
 - `municipio-geo-service` requiere la variable de entorno `AEMET_API_KEY`.
+- `municipio-meteo-service` toma su `AEMET_API_KEY` de `app/config.py` (configuración provisional).
 - Sin base de datos ni autenticación propia.
 - Tests pendientes para una fase posterior.
 
@@ -28,7 +30,8 @@ El proyecto se construye paso a paso, con contratos JSON compartidos y servicios
 │       └── solid-best-practices/SKILL.md
 ├── contracts/
 │   ├── municipio.schema.json
-│   └── json_schema_municipio_geo.json
+│   ├── json_schema_municipio_geo.json
+│   └── json_schema_municipio_meteo.json
 ├── services/
 │   ├── municipio-service/
 │   │   ├── app/
@@ -39,7 +42,17 @@ El proyecto se construye paso a paso, con contratos JSON compartidos y servicios
 │   │   │   └── main.py
 │   │   ├── requirements.txt
 │   │   └── README.md
-│   └── municipio-geo-service/
+│   ├── municipio-geo-service/
+│   │   ├── app/
+│   │   │   ├── api/
+│   │   │   ├── clients/
+│   │   │   ├── models/
+│   │   │   ├── repositories/
+│   │   │   ├── config.py
+│   │   │   └── main.py
+│   │   ├── requirements.txt
+│   │   └── README.md
+│   └── municipio-meteo-service/
 │       ├── app/
 │       │   ├── api/
 │       │   ├── clients/
@@ -60,6 +73,7 @@ Los esquemas JSON son la fuente de verdad y se comparten entre servicios.
 |---|---|
 | `contracts/municipio.schema.json` | Datos de un municipio: `municipioid`, `gentilicio`, `sitioweb` y `provincia`. |
 | `contracts/json_schema_municipio_geo.json` | Datos geográficos de un municipio: `municipioid`, `latitud`, `longitud` y `altitud`. |
+| `contracts/json_schema_municipio_meteo.json` | Datos meteorológicos de un municipio: `municipioid`, `temperatura_actual`, `temperaturas`, `humedad`, `viento`, `precipitacion` y `estadocielo`. |
 
 ## Catálogo de servicios
 
@@ -67,6 +81,7 @@ Los esquemas JSON son la fuente de verdad y se comparten entre servicios.
 |---|---|---|---|---|
 | `municipio-service` | Python 3.12 + FastAPI | `GET /municipio` | 8001 | Implementado |
 | `municipio-geo-service` | Python 3.12 + FastAPI | `GET /municipio/geo` | 8002 | Implementado |
+| `municipio-meteo-service` | Python 3.12 + FastAPI | `GET /granada/meteo` | 8003 | Implementado |
 
 ### `municipio-service`
 
@@ -97,6 +112,28 @@ Consulta AEMET OpenData y devuelve los datos geográficos de Granada con id `180
 ```
 
 Requiere configurar `AEMET_API_KEY`. Sin la clave, el endpoint responde `503 Service Unavailable`.
+
+### `municipio-meteo-service`
+
+Consulta AEMET OpenData y devuelve los datos meteorológicos de Granada con id `18087`:
+
+```json
+{
+  "municipioid": 18087,
+  "temperatura_actual": "14",
+  "temperaturas": {
+    "max": "23",
+    "min": "2"
+  },
+  "humedad": "80",
+  "viento": "O 10",
+  "precipitacion": "30",
+  "estadocielo": "Intervalos nubosos con lluvia escasa"
+}
+```
+
+Usa la predicción diaria de AEMET. La clave se define en `app/config.py` como
+configuración provisional. Sin clave, el endpoint responde `503 Service Unavailable`.
 
 ## Agentes
 
@@ -155,11 +192,29 @@ curl http://localhost:8002/municipio/geo
 
 La documentación interactiva de FastAPI queda disponible en `http://localhost:8002/docs`.
 
+### `municipio-meteo-service`
+
+```bash
+cd services/municipio-meteo-service
+python3 -m venv .venv
+source .venv/bin/activate
+pip install -r requirements.txt
+uvicorn app.main:app --reload --port 8003
+```
+
+Comprobación:
+
+```bash
+curl http://localhost:8003/granada/meteo
+```
+
+La documentación interactiva de FastAPI queda disponible en `http://localhost:8003/docs`.
+
 ## Siguientes pasos
 
 1. Añadir tests de respuesta y validación contra los contratos.
 2. Configurar `AEMET_API_KEY` y validar la respuesta real de `municipio-geo-service`.
-3. Ampliar los servicios de AEMET con predicciones meteorológicas.
+3. Mover la clave de AEMET de `app/config.py` a variables de entorno en los servicios que la consultan.
 4. Crear el primer servicio Java/Spring Boot reutilizando los contratos.
 5. Añadir gateway y Docker Compose cuando el conjunto de servicios lo requiera.
 
